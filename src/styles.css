@@ -1,0 +1,723 @@
+/* ---------------------------------------------------------------------------
+   NOMAD 01
+   字体：Geist / Geist Mono 自托管，中文回落系统黑体
+   配色：单一深色主题，单一强调色 #9fd7e8，圆角统一为 0
+--------------------------------------------------------------------------- */
+
+@font-face {
+  font-family: "Geist";
+  src: url("/fonts/geist.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Geist Mono";
+  src: url("/fonts/geist-mono.woff2") format("woff2");
+  font-weight: 400 600;
+  font-display: swap;
+}
+
+:root {
+  --bg: #0a0b0c;
+  --bg-2: #101214;
+  --fg: #e9e9e6;
+  --muted: #8b8d8f;
+  --line: rgba(233, 233, 230, 0.14);
+  --line-soft: rgba(233, 233, 230, 0.07);
+  --accent: #9fd7e8;
+  --pad: clamp(20px, 4.2vw, 64px);
+  --max: 1440px;
+  --nav: 72px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --sans: "Geist", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+    "Noto Sans SC", system-ui, sans-serif;
+  --mono: "Geist Mono", ui-monospace, "SFMono-Regular", monospace;
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.75;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+p,
+dl,
+dd,
+dt,
+ul,
+li,
+form {
+  margin: 0;
+  padding: 0;
+}
+
+ul {
+  list-style: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* ---------------------------------------------------------------- stage --- */
+
+#stage {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+#scene {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(46% 42% at 64% 44%, rgba(255, 255, 255, 0.07), transparent 70%),
+    radial-gradient(40% 38% at 30% 62%, rgba(159, 215, 232, 0.05), transparent 72%);
+  pointer-events: none;
+}
+
+.poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+}
+
+body.no-webgl .poster {
+  display: block;
+}
+
+body.no-webgl #scene,
+body.no-webgl #labels {
+  display: none;
+}
+
+.poster.is-static {
+  display: block;
+}
+
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    rgba(10, 11, 12, 0.9) 0%,
+    rgba(10, 11, 12, 0.6) 24%,
+    rgba(10, 11, 12, 0) 54%
+  );
+  transition: background 0.8s var(--ease);
+}
+
+.scrim[data-side="right"] {
+  background: linear-gradient(
+    270deg,
+    rgba(10, 11, 12, 0.9) 0%,
+    rgba(10, 11, 12, 0.6) 24%,
+    rgba(10, 11, 12, 0) 54%
+  );
+}
+
+#labels {
+  position: absolute;
+  inset: 0;
+}
+
+.lbl {
+  position: absolute;
+  transform: translate(0, -50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+  transition: opacity 0.45s var(--ease);
+  white-space: nowrap;
+}
+
+.lbl.is-on {
+  opacity: 1;
+}
+
+.lbl i {
+  display: block;
+  width: 5px;
+  height: 5px;
+  background: var(--accent);
+}
+
+.lbl span {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  color: var(--fg);
+}
+
+.lbl em {
+  font-style: normal;
+  color: var(--muted);
+  margin-left: 8px;
+  letter-spacing: 0.04em;
+}
+
+/* --------------------------------------------------------------- loader --- */
+
+#loader {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 18px;
+  background: var(--bg);
+  transition: opacity 0.7s var(--ease), visibility 0.7s;
+}
+
+#loader.is-done {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.loader-mark {
+  font-weight: 500;
+  letter-spacing: 0.34em;
+  font-size: 13px;
+  padding-left: 0.34em;
+}
+
+.loader-bar {
+  width: 210px;
+  height: 1px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.loader-bar i {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.3s linear;
+}
+
+.loader-num {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--muted);
+}
+
+/* ------------------------------------------------------------------ nav --- */
+
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  height: var(--nav);
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 3vw, 40px);
+  padding: 0 var(--pad);
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.4s var(--ease), background-color 0.4s var(--ease);
+}
+
+/* 顶部只留一层很淡的渐变，避免导航变成一条压住产品的色带 */
+.nav::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(10, 11, 12, 0.62) 0%,
+    rgba(10, 11, 12, 0.2) 62%,
+    rgba(10, 11, 12, 0) 100%
+  );
+  transition: opacity 0.4s var(--ease);
+}
+
+.nav > * {
+  position: relative;
+  z-index: 1;
+}
+
+.nav.is-scrolled {
+  background-color: rgba(10, 11, 12, 0.9);
+  border-bottom-color: var(--line-soft);
+}
+
+.nav.is-scrolled::before {
+  opacity: 0;
+}
+
+.mark {
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: flex-start;
+}
+
+.mark-sup {
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin-left: 4px;
+  transform: translateY(-2px);
+}
+
+.nav-links {
+  display: flex;
+  gap: clamp(16px, 2.2vw, 30px);
+  margin-left: 6px;
+}
+
+.nav-links a {
+  font-size: 13px;
+  color: var(--muted);
+  transition: color 0.25s var(--ease);
+  padding: 6px 0;
+  letter-spacing: 0.04em;
+}
+
+.nav-links a:hover {
+  color: var(--fg);
+}
+
+.nav-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 34px;
+  padding: 0 16px;
+  margin-left: auto;
+  border: 1px solid var(--line);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  transition: border-color 0.25s var(--ease), background 0.25s var(--ease);
+}
+
+.nav-cta:hover {
+  border-color: var(--fg);
+  background: rgba(233, 233, 230, 0.06);
+}
+
+/* ----------------------------------------------------------------- main --- */
+
+main {
+  position: relative;
+  z-index: 10;
+}
+
+.hero,
+.chapter,
+.buy {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 0 var(--pad);
+}
+
+.hero {
+  min-height: 100dvh;
+  display: grid;
+  align-content: center;
+  padding-top: calc(var(--nav) + 24px);
+  padding-bottom: 72px;
+}
+
+.hero-copy {
+  max-width: 30rem;
+}
+
+h1 {
+  font-size: clamp(2.3rem, 5.2vw, 4.4rem);
+  line-height: 1.14;
+  letter-spacing: 0.01em;
+  font-weight: 500;
+}
+
+.hero p {
+  margin-top: 26px;
+  max-width: 24em;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.85;
+}
+
+.hero-actions {
+  margin-top: 34px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 52px;
+  padding: 0 26px;
+  background: var(--fg);
+  color: #0a0b0c;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  transition: transform 0.25s var(--ease), background 0.25s var(--ease);
+}
+
+.btn:hover {
+  background: #fff;
+}
+
+.btn:active {
+  transform: translateY(1px) scale(0.995);
+}
+
+/* -------------------------------------------------------------- chapter --- */
+
+.chapter {
+  position: relative;
+  min-height: 108dvh;
+  display: grid;
+  align-content: center;
+  padding-top: 12vh;
+  padding-bottom: 12vh;
+}
+
+.chapter-copy {
+  max-width: 27rem;
+}
+
+.chapter-right {
+  justify-items: end;
+}
+
+.chapter-right .chapter-copy,
+.chapter-right .spec-table {
+  justify-self: end;
+}
+
+h2 {
+  font-size: clamp(1.75rem, 3.2vw, 2.9rem);
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  font-weight: 500;
+}
+
+.chapter-copy p {
+  margin-top: 20px;
+  max-width: 23em;
+  color: var(--muted);
+  line-height: 1.85;
+}
+
+.chapter-list,
+.spec-table {
+  margin-top: 38px;
+  width: min(100%, 27rem);
+  border-top: 1px solid var(--line-soft);
+}
+
+.chapter-list li,
+.spec-table > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 24px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--line-soft);
+  font-size: 13.5px;
+}
+
+.chapter-list li span:first-child,
+.spec-table dt {
+  color: var(--fg);
+  letter-spacing: 0.04em;
+}
+
+.chapter-list li span:last-child,
+.spec-table dd {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  text-align: right;
+}
+
+/* ------------------------------------------------------------- swatches --- */
+
+.swatches {
+  display: flex;
+  gap: 10px;
+  margin-top: 34px;
+  flex-wrap: wrap;
+}
+
+.swatch {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 16px 0 12px;
+  border: 1px solid var(--line);
+  font-size: 12.5px;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  transition: border-color 0.25s var(--ease), color 0.25s var(--ease);
+}
+
+.swatch i {
+  width: 14px;
+  height: 14px;
+  background: var(--sw);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.swatch[aria-pressed="true"] {
+  border-color: var(--fg);
+  color: var(--fg);
+}
+
+.swatch:hover {
+  border-color: rgba(233, 233, 230, 0.4);
+}
+
+/* ---------------------------------------------------------------- 预约 --- */
+
+.buy {
+  position: relative;
+  min-height: 96dvh;
+  display: grid;
+  align-content: center;
+  padding-top: 12vh;
+  padding-bottom: 12vh;
+}
+
+.buy-copy {
+  max-width: 26rem;
+}
+
+.buy-price {
+  margin-top: 16px;
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+}
+
+.buy-copy > p {
+  margin-top: 16px;
+  color: var(--muted);
+  max-width: 23em;
+}
+
+.reserve {
+  margin-top: 34px;
+}
+
+.reserve label {
+  display: block;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.field {
+  display: flex;
+  gap: 10px;
+}
+
+.field input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 52px;
+  padding: 0 16px;
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--fg);
+  font-family: var(--sans);
+  font-size: 14px;
+  transition: border-color 0.2s var(--ease);
+}
+
+.field input::placeholder {
+  color: #7c7e80;
+  letter-spacing: 0.02em;
+}
+
+.field input:focus {
+  outline: none;
+  border-color: var(--fg);
+}
+
+.field input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.field .btn {
+  flex: 0 0 auto;
+  height: 52px;
+  padding: 0 22px;
+}
+
+.form-note {
+  margin-top: 12px;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  min-height: 1.2em;
+}
+
+.form-note.is-ok {
+  color: var(--accent);
+}
+
+.form-note.is-error {
+  color: #d99b8a;
+}
+
+/* ----------------------------------------------------------------- foot --- */
+
+.foot {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 40px var(--pad) 56px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--line-soft);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.foot p {
+  max-width: 40em;
+  line-height: 1.7;
+}
+
+.foot a {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+.foot a:hover {
+  color: var(--fg);
+}
+
+/* ------------------------------------------------------------ responsive --- */
+
+@media (max-width: 860px) {
+  .hero {
+    align-content: end;
+    padding-bottom: 56px;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 8.6vw, 2.9rem);
+  }
+
+  .chapter,
+  .buy {
+    min-height: 92dvh;
+    align-content: end;
+    padding-bottom: 15vh;
+  }
+
+  .chapter-right {
+    justify-items: start;
+  }
+
+  .chapter-right .chapter-copy,
+  .chapter-right .spec-table {
+    justify-self: start;
+  }
+
+  .scrim,
+  .scrim[data-side="right"] {
+    background: linear-gradient(
+      0deg,
+      rgba(10, 11, 12, 0.94) 0%,
+      rgba(10, 11, 12, 0.72) 34%,
+      rgba(10, 11, 12, 0) 68%
+    );
+  }
+
+  #labels {
+    display: none;
+  }
+
+  .nav-links {
+    display: none;
+  }
+
+  .nav-cta {
+    margin-left: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

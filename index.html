@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>NOMAD 01 / 听见房间，听不见世界</title>
+    <meta
+      name="description"
+      content="NOMAD 01 头戴式封闭耳机。铝合金骨架，40 mm 镀铍振膜单元，耳垫、网罩、叉臂均可单独拆换。"
+    />
+    <meta name="theme-color" content="#0a0b0c" />
+    <link
+      rel="preload"
+      href="/fonts/geist.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/geist-mono.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script type="module" src="/src/main.js"></script>
+  </head>
+  <body>
+    <div id="stage" aria-hidden="true">
+      <div class="glow"></div>
+      <canvas id="scene"></canvas>
+      <img class="poster" id="poster" alt="NOMAD 01 石墨色头戴耳机" />
+      <div id="labels"></div>
+      <noscript>
+        <img
+          class="poster is-static"
+          src="/poster.png"
+          alt="NOMAD 01 石墨色头戴耳机"
+        />
+      </noscript>
+    </div>
+    <div class="scrim" data-side="left"></div>
+
+    <div id="loader" aria-live="polite">
+      <span class="loader-mark">NOMAD</span>
+      <div class="loader-bar"><i></i></div>
+      <span class="loader-num">00</span>
+    </div>
+
+    <header class="nav">
+      <a class="mark" href="#top">NOMAD<span class="mark-sup">01</span></a>
+      <nav class="nav-links" aria-label="页面章节">
+        <a href="#anatomy">拆解</a>
+        <a href="#fold">折叠</a>
+        <a href="#finishes">配色</a>
+      </nav>
+      <a class="nav-cta" href="#buy">预约</a>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero-copy">
+          <h1>听见房间，<br />听不见世界。</h1>
+          <p>
+            头戴式封闭耳机。铝合金骨架，40 mm
+            镀铍振膜单元。耳垫、网罩、叉臂都能单独拆换。
+          </p>
+          <div class="hero-actions">
+            <a class="btn" href="#buy">预约首批</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter" id="anatomy">
+        <div class="chapter-copy">
+          <h2>六个零件。<br />一个整体。</h2>
+          <p>全部徒手拆装，不需要工具。会磨损的部件，就是你能换掉的部件。</p>
+        </div>
+        <ul class="chapter-list">
+          <li><span>耳垫</span><span>记忆棉，蛋白皮</span></li>
+          <li><span>网罩</span><span>车削钢，10 圈</span></li>
+          <li><span>叉臂</span><span>单臂结构，90° 铰链</span></li>
+          <li><span>头梁</span><span>铝合金，22 mm 行程</span></li>
+        </ul>
+      </section>
+
+      <section class="chapter chapter-right" id="fold">
+        <div class="chapter-copy">
+          <h2>折平。<br />塞进包里。</h2>
+          <p>
+            杯体绕竖轴转 90 度，头梁缩回滑轨。放进你本来就带着的电脑内胆包。
+          </p>
+        </div>
+        <dl class="spec-table">
+          <div>
+            <dt>折叠高度</dt>
+            <dd>112 mm</dd>
+          </div>
+          <div>
+            <dt>铰链行程</dt>
+            <dd>90°</dd>
+          </div>
+          <div>
+            <dt>头梁行程</dt>
+            <dd>22 mm</dd>
+          </div>
+          <div>
+            <dt>线材</dt>
+            <dd>1.4 m 可拆</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="chapter" id="finishes">
+        <div class="chapter-copy">
+          <h2>四种表面。</h2>
+          <p>整块铝阳极氧化，耳罩做磨砂处理。挑一个和你桌面配得上的。</p>
+          <div class="swatches" role="group" aria-label="选择配色">
+            <button class="swatch" data-finish="graphite" aria-pressed="true">
+              <i style="--sw: #1c1e21"></i>石墨
+            </button>
+            <button class="swatch" data-finish="bone" aria-pressed="false">
+              <i style="--sw: #e6e1d6"></i>骨白
+            </button>
+            <button class="swatch" data-finish="steel" aria-pressed="false">
+              <i style="--sw: #9aa0a4"></i>钢灰
+            </button>
+            <button class="swatch" data-finish="ember" aria-pressed="false">
+              <i style="--sw: #a8461c"></i>焦橙
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="buy" id="buy">
+        <div class="buy-copy">
+          <h2>预约首批。</h2>
+          <p class="buy-price">$349</p>
+          <p>首批 2027 年 3 月发货。登记后开售当天通知你，不收定金。</p>
+
+          <form class="reserve" id="reserve" novalidate>
+            <label for="email">邮箱</label>
+            <div class="field">
+              <input
+                id="email"
+                name="email"
+                type="email"
+                inputmode="email"
+                autocomplete="email"
+                placeholder="you@example.com"
+                aria-describedby="form-note"
+              />
+              <button class="btn" type="submit">登记</button>
+            </div>
+            <p class="form-note" id="form-note" role="status">
+              概念页，不会真的发邮件。
+            </p>
+          </form>
+        </div>
+      </section>
+
+      <footer class="foot">
+        <span class="mark">NOMAD<span class="mark-sup">01</span></span>
+        <a href="#top">回到顶部</a>
+      </footer>
+    </main>
+  </body>
+</html>
